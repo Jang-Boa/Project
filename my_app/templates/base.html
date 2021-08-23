@@ -1,0 +1,20 @@
+<!-- base.html -->
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- CSS -->
+        <link rel='stylesheet' href='{{url_for('static', filename='css/style.css')}}'>
+        
+        <title> Recommendation of Car</title>
+    </head>
+    <body>
+        <center>
+        <h1> What kind of Car do you looking for? </h1>
+        </center>
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>

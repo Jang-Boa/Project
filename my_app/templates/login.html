@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    {% if session['username'] %}
+    <center>
+        <p>이미 로그인 하셨습니다.</p>
+    </center>
+    {% else %}
+    <center>
+        <div>
+            <h2>Login</h2>
+            <form action="/login" method="POST">
+                <input type="username" name="username" placeholder="Userid">
+                <input type="password" name="password" placeholder="Password">
+                <br><br>
+                <input type="submit" value="로그인">
+                
+            </form>
+            <button type="button" onclick="location.href='/' ">홈으로</button>
+        </div>
+    </center>
+    {% endif %}
+{% endblock %}
