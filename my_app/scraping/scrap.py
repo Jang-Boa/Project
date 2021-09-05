@@ -1,45 +1,77 @@
+# -*- coding: utf-8 -*- 
+"""
+네이버 자동차에 있는 정보를 웹 스크랩핑 하기 위한 코드입니다.
+"""
 import requests
 from bs4 import BeautifulSoup
+from urllib.request import urlopen
 
-BASE_URL = "https://auto.naver.com/car" # 네이버 자동차 홈에서 자동차 리스트를 볼 수 있는 사이트의 base
+BASE_URL = "https://auto.naver.com/car/mainList.nhn" # BASE URL 네이버 자동차 리스트 홈페이지
+IMPORT_URL = "?importYn=" # 수입 여부를 묻는 URL
+PAGE_URL = "&page=" # 페이지 숫자
 
-LIST_URL = f"{BASE_URL}/mainList.nhn" # 리스트 페이지 URL
-DOMESTIC_URL = f"{BASE_URL}/mainList.nhn?importYn=N" #&page=2
-IMPORT_URL = f"{BASE_URL}/mainList.nhn?importYn=Y"
+# BASE_URL = f"https://auto.naver.com/car" # 네이버 자동차 홈에서 자동차 리스트를 볼 수 있는 사이트의 base
+# LIST_URL = f"{BASE_URL}/mainList.nhn" # 리스트 페이지 URL
+# DOMESTIC_URL = f"{BASE_URL}/mainList.nhn?importYn=N&page=" # &page=2
+# IMPORT_URL = f"{BASE_URL}/mainList.nhn?importYn=Y&page="
 
-def get_page(page_url):
+def get_page(importation='',page_num=1):
     """
     get_page 함수는 페이지 URL 을 받아 해당 페이지를 가져오고 파싱한 두 결과들을 라턴하는 함수
     """
-    page = requests.get(LIST_URL) # soup: BeautifulSoup 으로 파싱한 객체
+
+    page = requests.get(BASE_URL+IMPORT_URL+str(importation)+PAGE_URL+str(page_num)) # soup: BeautifulSoup 으로 파싱한 객체
     soup = BeautifulSoup(page.content,'html.parser') # page: requests 을 통해 받은 페이지 (requests 에서 사용하는 response 객체
 
     return soup, page
 
-# def get_list(origin, page=None):
-#     # origin 은 국산차와 수입차를 구분하기 위함으로, 국산 = N, 수입 = Y
-#     ORIGIN_URL = f"{BASE_URL}/mainList.nhn?importYn={origin}"
+# function for get image list 
+# DEFAULT INFO : 국산차, 1 페이지
+def get_img(importation='N',page_num=1):
+    """
+    자동차 데이터를 수집하여 리스트 형태로 저장
+    """
+    if importation == 'Y':
+        car_birth = '수입차'
+    else:
+        car_birth = '국산차'
 
-#     soup, page = get_page(ORIGIN_URL)
+    # img_lst = [] # 이미지 데이터를 저장할 리스트
+    lst = [] # 정보 저장할 리스트 
+    for page in range(page_num):
+        s, p = get_page(importation, page+1)
+        for car in s.find_all('div',{'class':'model_ct'}):
+            name = car.select('div > a > span',{'class':'box'})[0].text # 자동차 이름
+            image = car.select('div > span > a > img')[0]['src'] # 자동차의 이미지
+            company = car.select('div > a > img')[0]['alt'] # 자동차 제조사
+            car_type = car.select('ul > li > a > span')[0].text # 자동차의 차종
+            car_price = car.select('ul > li')[0].text # 자동차 가격
+            if car_price == '가격정보없음':
+                price = None
+            else:
+                price = car_price.split('\n')[2]
 
-#     return 
+            fuel_efficiency = car.select('ul > li > span > span',{'class':'ell'})[0].text # 연비 
+            fuel = car.select('ul > li > span > span',{'class':'ell'})[1].text # 연료
+            
 
-# "https://auto.naver.com/car/carKindType.nhn?carKndCd=3&importYn=N&page=1"
-s, p = get_page(LIST_URL)
-a = s.find('span',{"class" : "cont"})
-# for n in a:
-#     print(n.get_text())
-# b = a.find(class_ = "box")
-# c = b.text
+            # img_lst.append(image)
+            lst.append([name, company, car_birth, car_type, price, fuel_efficiency, fuel, image])
+    
+    n = len(lst)
+    
+    print(lst[3])
+    print(f"총 {n}개의 {car_birth} 데이터를 수집하였습니다.")
+    return lst
 
-print(a.text)
-# print(page.text)
+get_img()
 
+### 
+# s, p = get_page()
+# a = s.find_all('div',{'class':'model_ct'})
+# b = a[2].select('ul > li > span > span',{'class':'ell'})[1].text
+# l = b.rstrip('\n')
+# print(len(b), len(l))
 
-# """
-# "https://auto.naver.com/car/mainList.nhn"
-# "https://auto.naver.com/car/mainList.nhn?importYn=N" # 국내차 
-# "https://auto.naver.com/car/mainList.nhn?importYn=Y" # 수입차
-
-# class = "model_ct"
-# """
+# images = s.find('div',{'class':'model_ct'}).find('img')['src']
+# print(images)
