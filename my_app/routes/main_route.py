@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect
 from my_app.models import user_model
 from my_app import db
+from my_app.models import car_model
 
 bp = Blueprint('main',__name__)
 

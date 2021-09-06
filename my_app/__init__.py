@@ -20,8 +20,7 @@ def create_app():
     with app.app_context(): # db 와 migrate 객체 초기화 
         db.init_app(app)
         migrate.init_app(app,db)
-    from . import models # 생성한 모델을 플라스크의 migrate 기능이 인식할 수 있도록 모델 가져오기
-
+    from my_app.models import car_model # 생성한 모델을 플라스크의 migrate 기능이 인식할 수 있도록 모델 가져오기
 
     # blueprint -> route
     from my_app.routes import main_route

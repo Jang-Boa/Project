@@ -5,6 +5,7 @@
 import requests
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+import re
 
 BASE_URL = "https://auto.naver.com/car/mainList.nhn" # BASE URL 네이버 자동차 리스트 홈페이지
 IMPORT_URL = "?importYn=" # 수입 여부를 묻는 URL
@@ -15,7 +16,7 @@ PAGE_URL = "&page=" # 페이지 숫자
 # DOMESTIC_URL = f"{BASE_URL}/mainList.nhn?importYn=N&page=" # &page=2
 # IMPORT_URL = f"{BASE_URL}/mainList.nhn?importYn=Y&page="
 
-def get_page(importation='',page_num=1):
+def get_page(importation='N',page_num=1):
     """
     get_page 함수는 페이지 URL 을 받아 해당 페이지를 가져오고 파싱한 두 결과들을 라턴하는 함수
     """
@@ -32,46 +33,92 @@ def get_img(importation='N',page_num=1):
     자동차 데이터를 수집하여 리스트 형태로 저장
     """
     if importation == 'Y':
-        car_birth = '수입차'
+        car_birth = '수입차' # 수입 여부 
     else:
         car_birth = '국산차'
 
     # img_lst = [] # 이미지 데이터를 저장할 리스트
-    lst = [] # 정보 저장할 리스트 
+    # lst = [] # 정보 저장할 리스트 
+    names = []
+    car_births =[]
+    images = []
+    companies =[]
+    car_types = []
+    car_prices_1 = []
+    car_prices_2 = []
+    fuel_efficiencies = []
+    fuels = []
+
     for page in range(page_num):
         s, p = get_page(importation, page+1)
         for car in s.find_all('div',{'class':'model_ct'}):
-            name = car.select('div > a > span',{'class':'box'})[0].text # 자동차 이름
+            name = car.select('div > a > span',{'class':'box'})[0].text # 자동차 이름, 제품명
+            names.append(name)
+
             image = car.select('div > span > a > img')[0]['src'] # 자동차의 이미지
-            company = car.select('div > a > img')[0]['alt'] # 자동차 제조사
+            images.append(image)
+
+            company = car.select('div > a > img')[0]['alt'] # 자동차 제조사, 브랜드명
+            companies.append(company)
+
             car_type = car.select('ul > li > a > span')[0].text # 자동차의 차종
-            car_price = car.select('ul > li')[0].text # 자동차 가격
+            car_types.append(car_type)
+            car_price = car.select('ul > li')[0].text # 자동차 가격 (단위 : 만원)
             if car_price == '가격정보없음':
-                price = None
+                price1 = None
+                price2 = None
             else:
                 price = car_price.split('\n')[2]
+                price = re.sub(r'[^0-9,~]','',price)
+                if '~' in price:
+                    price1 = int(price.split('~')[0].replace(',',''))
+                    price2 = int(price.split('~')[1].replace(',',''))
+                else:
+                    price1 = int(price.replace(',',''))
+                    price2 = None
+            car_prices_1.append(price1)
+            car_prices_2.append(price2)
 
-            fuel_efficiency = car.select('ul > li > span > span',{'class':'ell'})[0].text # 연비 
+            fuel_efficiency = car.select('ul > li > span > span',{'class':'ell'})[0].text.strip('\n') # 연비 
+            fuel_efficiencies.append(fuel_efficiency)
+
             fuel = car.select('ul > li > span > span',{'class':'ell'})[1].text # 연료
+            f = re.sub(r'[^A-Za-z0-9가-힣,]','',fuel) # 불필요한 특수문자 제거
+            fuels.append(f)
             
+            car_births.append(car_birth)
 
-            # img_lst.append(image)
-            lst.append([name, company, car_birth, car_type, price, fuel_efficiency, fuel, image])
+            # # img_lst.append(image)
+            # lst.append([name, company, car_birth, car_type, price1, price2, fuel_efficiency, f, image])
     
-    n = len(lst)
-    
-    print(lst[3])
+    cars = [data for data in zip(names,companies,car_births,car_types,car_prices_1,car_prices_2,fuel_efficiencies,fuels,images)]
+
+    n = len(cars) # number of crawled car data
     print(f"총 {n}개의 {car_birth} 데이터를 수집하였습니다.")
-    return lst
+    print(cars[0])
+    return cars
 
-get_img()
+get_img('N',5)
 
 ### 
+# import re
 # s, p = get_page()
 # a = s.find_all('div',{'class':'model_ct'})
-# b = a[2].select('ul > li > span > span',{'class':'ell'})[1].text
-# l = b.rstrip('\n')
-# print(len(b), len(l))
+# b = a[14].select('ul > li')[0].text
+# #l = re.sub(r'[^가-힣]','',b)
+# if b == '가격정보없음':
+#     p = None
+# else:
+#     p = b.split('\n')[2]
+#     p = re.sub(r'[^0-9,~]','',p)
+#     if '~' in p:
+#         p1 = p.split('~')[0]
+#         p2 = p.split('~')[1]
+#         print(p1, p2)
+
+# print(p)
+# print('~' in p)
+
 
 # images = s.find('div',{'class':'model_ct'}).find('img')['src']
 # print(images)
