@@ -95,30 +95,6 @@ def get_img(importation='N',page_num=1):
 
     n = len(cars) # number of crawled car data
     print(f"총 {n}개의 {car_birth} 데이터를 수집하였습니다.")
-    print(cars[0])
+    # print(cars)
     return cars
-
-get_img('N',5)
-
-### 
-# import re
-# s, p = get_page()
-# a = s.find_all('div',{'class':'model_ct'})
-# b = a[14].select('ul > li')[0].text
-# #l = re.sub(r'[^가-힣]','',b)
-# if b == '가격정보없음':
-#     p = None
-# else:
-#     p = b.split('\n')[2]
-#     p = re.sub(r'[^0-9,~]','',p)
-#     if '~' in p:
-#         p1 = p.split('~')[0]
-#         p2 = p.split('~')[1]
-#         print(p1, p2)
-
-# print(p)
-# print('~' in p)
-
-
-# images = s.find('div',{'class':'model_ct'}).find('img')['src']
-# print(images)
+    
