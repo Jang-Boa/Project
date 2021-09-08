@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import re
 
+
 BASE_URL = "https://auto.naver.com/car/mainList.nhn" # BASE URL 네이버 자동차 리스트 홈페이지
 IMPORT_URL = "?importYn=" # 수입 여부를 묻는 URL
 PAGE_URL = "&page=" # 페이지 숫자
@@ -97,4 +98,3 @@ def get_img(importation='N',page_num=1):
     print(f"총 {n}개의 {car_birth} 데이터를 수집하였습니다.")
     # print(cars)
     return cars
-    

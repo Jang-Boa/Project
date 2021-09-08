@@ -6,6 +6,30 @@
         <h3> 추천 차량 </h3>
         <h4> " 어떠세요."</h4>
         <br>
+        <h1>Flask-SQLAlchemy Tutorial</h1>
+        {% for car in cars %}
+        <ul id="car.username">
+        <li>
+            <span class="field-name">User:</span>
+            <span class="field-value">{{ car.name }}</span>
+        </li>
+        <li>
+            <span class="field-name">Company:</span>
+            <span class="field-value">{{ car.company }}</span>
+        </li>
+        <li>
+            <span class="field-name">Type:</span>
+            <span class="field-value">{{ car.types }}</span>
+        </li>
+        <li>
+            <span class="field-name">Price:</span>
+            <span class="field-value">{{ car.price1 }} ~ {{ car.price2 }}</span>
+        </li>
+        <li>
+            <span class="field-name">Image:</span>
+            <span class="field-value">{{ car.image }}</span>
+        </li>
+        </ul>
     </div>
     <button type="button" onclick="location.href='/' ">홈으로</button>
 

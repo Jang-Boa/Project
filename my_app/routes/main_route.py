@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect
 from my_app.models import user_model
 from my_app import db
 from my_app.models import car_model
+from my_app.models.car_model import Car
+import csv
 
 bp = Blueprint('main',__name__)
 
@@ -71,6 +73,6 @@ def prefer():
 	return render_template("prefer.html")
 
 # recommend
-@bp.route('/prefer/recommend', methods=['GET'])
-def recommend():
+@bp.route('/prefer/recommend', methods=['GET','POST'])
+def recommend_index():
 	return render_template("recommend.html")
